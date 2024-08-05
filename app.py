@@ -29,6 +29,7 @@ df['Daily Date'] = pd.to_datetime(df['Daily Date'], format='%d/%m/%Y')
 print("Dataset columns: ", df.columns)
 print("Scaler feature names: ", scaler.feature_names_in_)
 
+
 # Function to create sequences
 def create_sequences(data, seq_length):
     xs = []
@@ -37,7 +38,7 @@ def create_sequences(data, seq_length):
         xs.append(x)
     return np.array(xs)
 
-# prediction app
+# Prediction app
 def make_predictions(start_date, end_date, model):
     # Convert input dates to datetime
     start_date = pd.to_datetime(start_date)
@@ -52,38 +53,25 @@ def make_predictions(start_date, end_date, model):
     start_index = df[df['Daily Date'] == last_known_date].index[0]
     
     # Get the previous 30 days of data
-    data = df.iloc[max(0, start_index-29):start_index+1]
+    data_to_scale = df.iloc[start_index-30:start_index].drop(columns=['Daily Date'])
     
-    # Prepare the data for scaling
-    columns_to_scale = [col for col in df.columns if col != 'Daily Date']
-    data_to_scale = data[columns_to_scale]
+    # Verify the data shape and columns
+    print("Data to scale columns: ", data_to_scale.columns)
+    print("Data to scale shape: ", data_to_scale.shape)
     
-    # Scale the data
+    # Check if the feature names match
+    if not np.array_equal(data_to_scale.columns, scaler.feature_names_in_):
+        st.error("Feature names do not match the scaler's feature names.")
+        return None
+    
+    # Transform the data
     scaled_data = scaler.transform(data_to_scale)
     
-    # Create initial sequence
-    X = create_sequences(scaled_data, min(30, len(scaled_data)))
+    # Create sequences
+    sequences = create_sequences(scaled_data, 30)
     
-    predictions = []
-    current_sequence = X[-1]
-    
-    # Predict for each day from start_date to end_date
-    current_date = start_date
-    while current_date <= end_date:
-        # Make prediction
-        pred = model.predict(np.array([current_sequence]))
-        
-        # Append prediction
-        predictions.append(pred[0][0])
-        
-        # Update sequence for next prediction
-        current_sequence = np.roll(current_sequence, -1, axis=0)
-        current_sequence[-1] = pred[0]
-        
-        current_date += timedelta(days=1)
-    
-    # Inverse transform the predictions
-    predictions = scaler.inverse_transform(np.concatenate((np.array(predictions).reshape(-1, 1), np.zeros((len(predictions), scaled_data.shape[1] - 1))), axis=1))[:, 0]
+    # Make predictions
+    predictions = model.predict(sequences)
     
     return predictions
 
