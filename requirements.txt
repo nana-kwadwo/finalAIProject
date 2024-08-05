@@ -1,3 +1,8 @@
 joblib
 numpy==1.26.4
 matplotlib-plyplot
+numpy
+scipy
+scikit-learn
+pandas
+streamlit
