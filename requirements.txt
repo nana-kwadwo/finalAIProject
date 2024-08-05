@@ -1,7 +1,6 @@
 joblib
 numpy
 matplotlib-pyplot
-numpy
 scipy
 scikit-learn
 pandas
