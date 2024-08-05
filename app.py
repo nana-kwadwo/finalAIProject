@@ -2,14 +2,22 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
+import gdown 
+import pickle
 
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
+gdown("https://drive.google.com/uc?export=download&id=12UF7LkMU34O2gW4K1mF6RVVZzLtUahul", 'gru_model.joblib')
+
+gdown("https://drive.google.com/uc?export=download&id=1iI-lEjkPHMniG6C2IyburH2RulV-m5k5", 'lstm_model.joblib')
+
+gdown("https://drive.google.com/uc?export=download&id=1gm-8yaktfPtmSBqvRpGWKFvq5LijAlRq", 'scaler.pkl')
+
 # Load the models and scaler
 lstm_model = joblib.load('lstm_model.joblib')
 gru_model = joblib.load('gru_model.joblib')
-scaler = joblib.load('scaler.joblib')
+scaler = pickle.load('scaler.pkl')
 
 # Load the dataset
 df = pd.read_csv("CFC_traded_sahres_2019_to_date.csv")
