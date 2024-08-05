@@ -121,10 +121,12 @@ if start_date and end_date:
             # Plotting the graph
             fig, ax = plt.subplots(figsize=(10, 6))
             
-            # Plot actual prices if available
-            actual_data = df[(df['Daily Date'] >= start_date) & (df['Daily Date'] <= end_date)]
-            if not actual_data.empty:
-                ax.plot(actual_data['Daily Date'], actual_data['Closing Price - VWAP (GH¢)'], label='Actual Price')
+            # Check if the date range is within the dataset
+            if start_date >= df['Daily Date'].min() and end_date <= df['Daily Date'].max():
+                # Plot actual prices if available
+                actual_data = df[(df['Daily Date'] >= start_date) & (df['Daily Date'] <= end_date)]
+                if not actual_data.empty:
+                    ax.plot(actual_data['Daily Date'], actual_data['Closing Price - VWAP (GH¢)'], label='Actual Price')
             
             # Plot predicted prices
             ax.plot(pred_df['Date'], pred_df['Predicted Price'], label='Predicted Price', color='r', linestyle='--')
