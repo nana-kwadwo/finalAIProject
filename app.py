@@ -7,11 +7,11 @@ import gdown
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
-gdown("https://drive.google.com/uc?export=download&id=12UF7LkMU34O2gW4K1mF6RVVZzLtUahul", 'gru_model.joblib')
+gdown.cached_download("https://drive.google.com/uc?export=download&id=12UF7LkMU34O2gW4K1mF6RVVZzLtUahul", 'gru_model.joblib')
 
-gdown("https://drive.google.com/uc?export=download&id=1iI-lEjkPHMniG6C2IyburH2RulV-m5k5", 'lstm_model.joblib')
+gdown.cached_download("https://drive.google.com/uc?export=download&id=1iI-lEjkPHMniG6C2IyburH2RulV-m5k5", 'lstm_model.joblib')
 
-gdown("https://drive.google.com/uc?export=download&id=1gm-8yaktfPtmSBqvRpGWKFvq5LijAlRq", 'scaler.pkl')
+gdown.cached_download("https://drive.google.com/uc?export=download&id=1gm-8yaktfPtmSBqvRpGWKFvq5LijAlRq", 'scaler.pkl')
 
 # Load the models and scaler
 lstm_model = joblib.load('lstm_model.joblib')
