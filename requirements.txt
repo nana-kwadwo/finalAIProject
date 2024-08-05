@@ -1,2 +1,2 @@
 joblib
-matplotlib.plyplot
+matplotlib-plyplot
