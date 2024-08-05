@@ -89,15 +89,15 @@ def make_predictions(start_date, end_date, model):
 
 
 # Streamlit app
-st.title('Stock Price Prediction App')
+st.title('Cocoa Market Price Predictor')
 
 # Date range input
-start_date = st.date_input('Select start date for prediction')
-end_date = st.date_input('Select end date for prediction')
+start_date = st.date_input('Select start date')
+end_date = st.date_input('Select close date')
 
 if start_date and end_date:
     if start_date > end_date:
-        st.error('End date must be after start date')
+        st.error('Close date must be after start date')
     else:
         # Convert start_date and end_date to pandas Timestamp
         start_date = pd.Timestamp(start_date)
