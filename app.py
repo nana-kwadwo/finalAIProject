@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
 # Load the models and scaler
-lstm_model = joblib.load('lstm_model.keras')
-gru_model = joblib.load('gru_model.keras')
-scaler = joblib.load('scaler.pkl')
+lstm_model = joblib.load('/content/drive/MyDrive/AI Final Project/lstm_model.joblib')
+gru_model = joblib.load('/content/drive/MyDrive/AI Final Project/gru_model.joblib')
+scaler = joblib.load('/content/drive/MyDrive/AI Final Project/scaler.joblib')
 
 # Load the dataset
 df = pd.read_csv("/content/drive/MyDrive/AI Final Project/CFC_traded_sahres_2019_to_date.csv")
