@@ -7,10 +7,9 @@ import gdown
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
+# Download the models and scaler
 gdown.cached_download("https://drive.google.com/uc?export=download&id=12UF7LkMU34O2gW4K1mF6RVVZzLtUahul", 'gru_model.joblib')
-
 gdown.cached_download("https://drive.google.com/uc?export=download&id=1iI-lEjkPHMniG6C2IyburH2RulV-m5k5", 'lstm_model.joblib')
-
 gdown.cached_download("https://drive.google.com/uc?export=download&id=1gm-8yaktfPtmSBqvRpGWKFvq5LijAlRq", 'scaler.pkl')
 
 # Load the models and scaler
@@ -23,16 +22,20 @@ df = pd.read_csv("CFC_traded_sahres_2019_to_date.csv")
 df['Daily Date'] = pd.to_datetime(df['Daily Date'], format='%d/%m/%Y')
 df = df.sort_values('Daily Date')
 
-# function to create sequences
+# Ensure the 'Daily Date' column is in datetime format
+df['Daily Date'] = pd.to_datetime(df['Daily Date'], format='%d/%m/%Y')
+
+# Verify feature names
+print("Dataset columns: ", df.columns)
+print("Scaler feature names: ", scaler.feature_names_in_)
+
+# Function to create sequences
 def create_sequences(data, seq_length):
     xs = []
     for i in range(len(data) - seq_length + 1):
         x = data[i:(i + seq_length)]
         xs.append(x)
     return np.array(xs)
-
-# Ensure the 'Daily Date' column is in datetime format
-df['Daily Date'] = pd.to_datetime(df['Daily Date'], format='%d/%m/%Y')
 
 # Modified function to make predictions
 def make_predictions(start_date, end_date, model):
@@ -51,8 +54,12 @@ def make_predictions(start_date, end_date, model):
     # Get the previous 30 days of data
     data = df.iloc[max(0, start_index-29):start_index+1]
     
+    # Drop 'Daily Date' column and ensure the order of columns matches the scaler's
+    data = data.drop(columns=['Daily Date'])
+    data = data[scaler.feature_names_in_]
+
     # Scale the data
-    scaled_data = scaler.transform(data.drop(columns=['Daily Date']))
+    scaled_data = scaler.transform(data)
     
     # Create initial sequence
     X = create_sequences(scaled_data, min(30, len(scaled_data)))
