@@ -91,6 +91,12 @@ def make_predictions(start_date, end_date, model):
 # Streamlit app
 st.title('Cocoa Market Price Predictor')
 
+# Add authors' names
+st.markdown("<h6 style='text-align: center; color: gray;'>By Nana Nyarko and Ibrahim Dasuki</h6>", unsafe_allow_html=True)
+
+# Add some space
+st.write("")
+
 # Date range input
 start_date = st.date_input('Select start date')
 end_date = st.date_input('Select close date')
