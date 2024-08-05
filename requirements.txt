@@ -1,6 +1,6 @@
 joblib
 numpy
-matplotlib-plyplot
+matplotlib-pyplot
 numpy
 scipy
 scikit-learn
