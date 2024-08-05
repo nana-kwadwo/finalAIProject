@@ -32,9 +32,10 @@ def create_sequences(data, seq_length):
     return np.array(xs)
 
 # function to make predictions
-def make_prediction(start_date, end_date, model):
-    # Find the index of the start date in the dataframe
-    start_index = df[df['Daily Date'] <= start_date].index[-1]
+def make_predictions(start_date, end_date, model):
+    # Find the index of the last date before start_date in the dataframe
+    last_known_date = df[df['Daily Date'] < start_date]['Daily Date'].max()
+    start_index = df[df['Daily Date'] == last_known_date].index[0]
     
     # Get the previous 30 days of data
     data = df.iloc[start_index-29:start_index+1]
@@ -46,7 +47,7 @@ def make_prediction(start_date, end_date, model):
     X = create_sequences(scaled_data, 30)
     
     predictions = []
-    current_sequence = X[0]
+    current_sequence = X[-1]
     
     # Predict for each day from start_date to end_date
     current_date = start_date
@@ -64,7 +65,7 @@ def make_prediction(start_date, end_date, model):
         current_date += timedelta(days=1)
     
     # Inverse transform the predictions
-    predictions = scaler.inverse_transform(np.concatenate((predictions, np.zeros((len(predictions), scaled_data.shape[1] - 1))), axis=1))[:, 0]
+    predictions = scaler.inverse_transform(np.concatenate((np.array(predictions).reshape(-1, 1), np.zeros((len(predictions), scaled_data.shape[1] - 1))), axis=1))[:, 0]
     
     return predictions
 
@@ -72,16 +73,16 @@ def make_prediction(start_date, end_date, model):
 st.title('Stock Price Prediction App')
 
 # Date range input
-start_date = st.date_input('Select start date')
-end_date = st.date_input('Select end date')
+start_date = st.date_input('Select start date for prediction')
+end_date = st.date_input('Select end date for prediction')
 
 if start_date and end_date:
     if start_date > end_date:
         st.error('End date must be after start date')
     else:
         # Make predictions
-        lstm_preds = make_prediction(start_date, end_date, lstm_model)
-        gru_preds = make_prediction(start_date, end_date, gru_model)
+        lstm_preds = make_predictions(start_date, end_date, lstm_model)
+        gru_preds = make_predictions(start_date, end_date, gru_model)
         
         # Calculate average predictions
         avg_preds = (lstm_preds + gru_preds) / 2
@@ -115,3 +116,7 @@ if start_date and end_date:
         ax.legend()
         
         st.pyplot(fig)
+
+        # Add a warning for future predictions
+        if end_date > df['Daily Date'].max():
+            st.warning('Predictions for dates beyond the last known date may be less accurate.')
