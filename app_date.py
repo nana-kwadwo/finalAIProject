@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
 # Load the models and scaler
-lstm_model = load_model('lstm_model.keras')
-gru_model = load_model('gru_model.keras')
+lstm_model = joblib.load('lstm_model.keras')
+gru_model = joblib.load('gru_model.keras')
 scaler = joblib.load('scaler.pkl')
 
 # Load the dataset
