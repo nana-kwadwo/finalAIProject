@@ -17,7 +17,7 @@ gdown("https://drive.google.com/uc?export=download&id=1gm-8yaktfPtmSBqvRpGWKFvq5
 # Load the models and scaler
 lstm_model = joblib.load('lstm_model.joblib')
 gru_model = joblib.load('gru_model.joblib')
-scaler = pickle.load('scaler.pkl')
+scaler = joblib.load('scaler.pkl')
 
 # Load the dataset
 df = pd.read_csv("CFC_traded_sahres_2019_to_date.csv")
