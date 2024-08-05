@@ -54,39 +54,39 @@ date = st.date_input('Select a date')
 
     
     # Check if date is it in the dataset
-    if date not in df['Daily Date'].values:
-        st.error('Selected date is not in the dataset. Please choose another date.')
-    else:
-        # Make predictions
-        lstm_pred = make_prediction(date, lstm_model)
-        gru_pred = make_prediction(date, gru_model)
+if date not in df['Daily Date'].values:
+    st.error('Selected date is not in the dataset. Please choose another date.')
+else:
+    # Make predictions
+    lstm_pred = make_prediction(date, lstm_model)
+    gru_pred = make_prediction(date, gru_model)
         
-        # Calculate average prediction
-        avg_pred = (lstm_pred + gru_pred) / 2
+    # Calculate average prediction
+    avg_pred = (lstm_pred + gru_pred) / 2
         
-        # Obtain the actual price at the time period
-        actual_price = df[df['Daily Date'] == date]['Closing Price - VWAP (GH¢)'].values[0]
+    # Obtain the actual price at the time period
+    actual_price = df[df['Daily Date'] == date]['Closing Price - VWAP (GH¢)'].values[0]
         
-        # Calculate difference between the average predicted price and the actual price
-        difference = avg_pred - actual_price
+    # Calculate difference between the average predicted price and the actual price
+    difference = avg_pred - actual_price
         
-        # Display the results
-        st.write(f'Predicted Closing Price: GH¢ {avg_pred:.2f}')
-        st.write(f'Actual Closing Price: GH¢ {actual_price:.2f}')
-        st.write(f'Difference: GH¢ {difference:.2f}')
+    # Display the results
+    st.write(f'Predicted Closing Price: GH¢ {avg_pred:.2f}')
+    st.write(f'Actual Closing Price: GH¢ {actual_price:.2f}')
+    st.write(f'Difference: GH¢ {difference:.2f}')
+    
+    # Plotting the graph
+    start_date = date - timedelta(days=14)
+    end_date = date + timedelta(days=14)
         
-        # Plotting the graph
-        start_date = date - timedelta(days=14)
-        end_date = date + timedelta(days=14)
+    plot_data = df[(df['Daily Date'] >= start_date) & (df['Daily Date'] <= end_date)]
+    
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(plot_data['Daily Date'], plot_data['Closing Price - VWAP (GH¢)'], label='Actual Price')
+    ax.axhline(y=avg_pred, color='r', linestyle='--', label='Predicted Price')
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Closing Price (GH¢)')
+    ax.set_title('Actual vs Predicted Closing Price')
+    ax.legend()
         
-        plot_data = df[(df['Daily Date'] >= start_date) & (df['Daily Date'] <= end_date)]
-        
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.plot(plot_data['Daily Date'], plot_data['Closing Price - VWAP (GH¢)'], label='Actual Price')
-        ax.axhline(y=avg_pred, color='r', linestyle='--', label='Predicted Price')
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Closing Price (GH¢)')
-        ax.set_title('Actual vs Predicted Closing Price')
-        ax.legend()
-        
-        st.pyplot(fig)
+    st.pyplot(fig)
