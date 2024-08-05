@@ -37,7 +37,7 @@ def create_sequences(data, seq_length):
         xs.append(x)
     return np.array(xs)
 
-# Modified function to make predictions
+# prediction app
 def make_predictions(start_date, end_date, model):
     # Convert input dates to datetime
     start_date = pd.to_datetime(start_date)
@@ -54,12 +54,12 @@ def make_predictions(start_date, end_date, model):
     # Get the previous 30 days of data
     data = df.iloc[max(0, start_index-29):start_index+1]
     
-    # Drop 'Daily Date' column and ensure the order of columns matches the scaler's
-    data = data.drop(columns=['Daily Date'])
-    data = data[scaler.feature_names_in_]
-
+    # Prepare the data for scaling
+    columns_to_scale = [col for col in df.columns if col != 'Daily Date']
+    data_to_scale = data[columns_to_scale]
+    
     # Scale the data
-    scaled_data = scaler.transform(data)
+    scaled_data = scaler.transform(data_to_scale)
     
     # Create initial sequence
     X = create_sequences(scaled_data, min(30, len(scaled_data)))
