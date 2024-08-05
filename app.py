@@ -87,6 +87,7 @@ def make_predictions(start_date, end_date, model):
     
     return predictions
 
+
 # Streamlit app
 st.title('Stock Price Prediction App')
 
@@ -98,6 +99,10 @@ if start_date and end_date:
     if start_date > end_date:
         st.error('End date must be after start date')
     else:
+        # Convert start_date and end_date to pandas Timestamp
+        start_date = pd.Timestamp(start_date)
+        end_date = pd.Timestamp(end_date)
+
         # Make predictions
         lstm_preds = make_predictions(start_date, end_date, lstm_model)
         if lstm_preds is not None:
@@ -121,12 +126,10 @@ if start_date and end_date:
             # Plotting the graph
             fig, ax = plt.subplots(figsize=(10, 6))
             
-            # Check if the date range is within the dataset
-            if start_date >= df['Daily Date'].min() and end_date <= df['Daily Date'].max():
-                # Plot actual prices if available
-                actual_data = df[(df['Daily Date'] >= start_date) & (df['Daily Date'] <= end_date)]
-                if not actual_data.empty:
-                    ax.plot(actual_data['Daily Date'], actual_data['Closing Price - VWAP (GH¢)'], label='Actual Price')
+            # Plot actual prices if available
+            actual_data = df[(df['Daily Date'] >= start_date) & (df['Daily Date'] <= end_date)]
+            if not actual_data.empty:
+                ax.plot(actual_data['Daily Date'], actual_data['Closing Price - VWAP (GH¢)'], label='Actual Price')
             
             # Plot predicted prices
             ax.plot(pred_df['Date'], pred_df['Predicted Price'], label='Predicted Price', color='r', linestyle='--')
