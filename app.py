@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import joblib
 import gdown 
+
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
@@ -12,12 +13,12 @@ gdown.cached_download("https://drive.google.com/uc?export=download&id=1iI-lEjkPH
 
 gdown.cached_download("https://drive.google.com/uc?export=download&id=1gm-8yaktfPtmSBqvRpGWKFvq5LijAlRq", 'scaler.pkl')
 
-# models and scaler
+# Load the models and scaler
 lstm_model = joblib.load('lstm_model.joblib')
 gru_model = joblib.load('gru_model.joblib')
 scaler = joblib.load('scaler.pkl')
 
-# dataset
+# Load the dataset
 df = pd.read_csv("CFC_traded_sahres_2019_to_date.csv")
 df['Daily Date'] = pd.to_datetime(df['Daily Date'], format='%d/%m/%Y')
 df = df.sort_values('Daily Date')
