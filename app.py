@@ -31,20 +31,31 @@ def create_sequences(data, seq_length):
         xs.append(x)
     return np.array(xs)
 
-# function to make predictions
+# Ensure the 'Daily Date' column is in datetime format
+df['Daily Date'] = pd.to_datetime(df['Daily Date'], format='%d/%m/%Y')
+
+# Modified function to make predictions
 def make_predictions(start_date, end_date, model):
+    # Convert input dates to datetime
+    start_date = pd.to_datetime(start_date)
+    end_date = pd.to_datetime(end_date)
+    
     # Find the index of the last date before start_date in the dataframe
     last_known_date = df[df['Daily Date'] < start_date]['Daily Date'].max()
+    if pd.isnull(last_known_date):
+        st.error("Start date is earlier than all dates in the dataset. Please choose a later start date.")
+        return None
+    
     start_index = df[df['Daily Date'] == last_known_date].index[0]
     
     # Get the previous 30 days of data
-    data = df.iloc[start_index-29:start_index+1]
+    data = df.iloc[max(0, start_index-29):start_index+1]
     
     # Scale the data
     scaled_data = scaler.transform(data.drop(columns=['Daily Date']))
     
     # Create initial sequence
-    X = create_sequences(scaled_data, 30)
+    X = create_sequences(scaled_data, min(30, len(scaled_data)))
     
     predictions = []
     current_sequence = X[-1]
@@ -82,41 +93,42 @@ if start_date and end_date:
     else:
         # Make predictions
         lstm_preds = make_predictions(start_date, end_date, lstm_model)
-        gru_preds = make_predictions(start_date, end_date, gru_model)
-        
-        # Calculate average predictions
-        avg_preds = (lstm_preds + gru_preds) / 2
-        
-        # Create date range for predictions
-        date_range = pd.date_range(start=start_date, end=end_date)
-        
-        # Create DataFrame with predictions
-        pred_df = pd.DataFrame({
-            'Date': date_range,
-            'Predicted Price': avg_preds
-        })
-        
-        # Display the results
-        st.write(pred_df)
-        
-        # Plotting the graph
-        fig, ax = plt.subplots(figsize=(10, 6))
-        
-        # Plot actual prices if available
-        actual_data = df[(df['Daily Date'] >= start_date) & (df['Daily Date'] <= end_date)]
-        if not actual_data.empty:
-            ax.plot(actual_data['Daily Date'], actual_data['Closing Price - VWAP (GH¢)'], label='Actual Price')
-        
-        # Plot predicted prices
-        ax.plot(pred_df['Date'], pred_df['Predicted Price'], label='Predicted Price', color='r', linestyle='--')
-        
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Closing Price (GH¢)')
-        ax.set_title('Actual vs Predicted Closing Price')
-        ax.legend()
-        
-        st.pyplot(fig)
+        if lstm_preds is not None:
+            gru_preds = make_predictions(start_date, end_date, gru_model)
+            
+            # Calculate average predictions
+            avg_preds = (lstm_preds + gru_preds) / 2
+            
+            # Create date range for predictions
+            date_range = pd.date_range(start=start_date, end=end_date)
+            
+            # Create DataFrame with predictions
+            pred_df = pd.DataFrame({
+                'Date': date_range,
+                'Predicted Price': avg_preds
+            })
+            
+            # Display the results
+            st.write(pred_df)
+            
+            # Plotting the graph
+            fig, ax = plt.subplots(figsize=(10, 6))
+            
+            # Plot actual prices if available
+            actual_data = df[(df['Daily Date'] >= start_date) & (df['Daily Date'] <= end_date)]
+            if not actual_data.empty:
+                ax.plot(actual_data['Daily Date'], actual_data['Closing Price - VWAP (GH¢)'], label='Actual Price')
+            
+            # Plot predicted prices
+            ax.plot(pred_df['Date'], pred_df['Predicted Price'], label='Predicted Price', color='r', linestyle='--')
+            
+            ax.set_xlabel('Date')
+            ax.set_ylabel('Closing Price (GH¢)')
+            ax.set_title('Actual vs Predicted Closing Price')
+            ax.legend()
+            
+            st.pyplot(fig)
 
-        # Add a warning for future predictions
-        if end_date > df['Daily Date'].max():
-            st.warning('Predictions for dates beyond the last known date may be less accurate.')
+            # Add a warning for future predictions
+            if end_date > df['Daily Date'].max():
+                st.warning('Predictions for dates beyond the last known date may be less accurate.')
